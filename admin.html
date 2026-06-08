@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Care Beyond Clinic</title>
+    <meta name="description"
+        content="Administrative dashboard for managing Care Beyond Clinic health assessment platform.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 5L25 15L35 17L27.5 24.5L29.5 35L20 29.5L10.5 35L12.5 24.5L5 17L15 15L20 5Z"
+                            fill="url(#gradient1)" />
+                        <defs>
+                            <linearGradient id="gradient1" x1="5" y1="5" x2="35" y2="35">
+                                <stop offset="0%" stop-color="#667eea" />
+                                <stop offset="100%" stop-color="#764ba2" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <span class="logo-text">Care Beyond Clinic - Admin</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="assessment.html">Health Assessment</a></li>
+                <li><a href="admin.html" class="active">Admin</a></li>
+            </ul>
+            <button class="nav-cta" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Admin Dashboard -->
+    <main class="admin-page">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-item active" data-section="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="#patients" class="nav-item" data-section="patients">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">Patients</span>
+                </a>
+                <a href="#analytics" class="nav-item" data-section="analytics">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+                <a href="#model" class="nav-item" data-section="model">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">ML Model</span>
+                </a>
+                <a href="#settings" class="nav-item" data-section="settings">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="admin-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <div class="section-header-admin">
+                    <div>
+                        <h1>Dashboard Overview</h1>
+                        <p class="subtitle">Real-time system metrics and patient statistics</p>
+                    </div>
+                    <button class="btn-secondary" onclick="refreshDashboard()">
+                        <span>🔄 Refresh</span>
+                    </button>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card-admin">
+                        <div class="stat-header">
+                            <span class="stat-icon-admin">📋</span>
+                            <span class="stat-trend positive">+12%</span>
+                        </div>
+                        <h3 class="stat-value" id="totalAssessments">1,247</h3>
+                        <p class="stat-label">Total Assessments</p>
+                    </div>
+
+                    <div class="stat-card-admin">
+                        <div class="stat-header">
+                            <span class="stat-icon-admin">⚠️</span>
+                            <span class="stat-trend negative">+3%</span>
+                        </div>
+                        <h3 class="stat-value high-risk" id="highRiskPatients">87</h3>
+                        <p class="stat-label">High Risk Patients</p>
+                    </div>
+
+                    <div class="stat-card-admin">
+                        <div class="stat-header">
+                            <span class="stat-icon-admin">✅</span>
+                            <span class="stat-trend positive">+8%</span>
+                        </div>
+                        <h3 class="stat-value low-risk" id="lowRiskPatients">892</h3>
+                        <p class="stat-label">Low Risk Patients</p>
+                    </div>
+
+                    <div class="stat-card-admin">
+                        <div class="stat-header">
+                            <span class="stat-icon-admin">🎯</span>
+                            <span class="stat-trend">--</span>
+                        </div>
+                        <h3 class="stat-value" id="avgRiskScore">0.34</h3>
+                        <p class="stat-label">Average Risk Score</p>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Risk Distribution</h3>
+                            <select class="chart-filter">
+                                <option>Last 7 days</option>
+                                <option>Last 30 days</option>
+                                <option>Last 90 days</option>
+                            </select>
+                        </div>
+                        <div class="chart-placeholder">
+                            <div class="risk-distribution">
+                                <div class="risk-bar-chart">
+                                    <div class="bar-item">
+                                        <div class="bar-label">Low Risk</div>
+                                        <div class="bar-container">
+                                            <div class="bar-fill low" style="width: 71.5%"></div>
+                                        </div>
+                                        <div class="bar-value">71.5%</div>
+                                    </div>
+                                    <div class="bar-item">
+                                        <div class="bar-label">Moderate</div>
+                                        <div class="bar-container">
+                                            <div class="bar-fill moderate" style="width: 21.5%"></div>
+                                        </div>
+                                        <div class="bar-value">21.5%</div>
+                                    </div>
+                                    <div class="bar-item">
+                                        <div class="bar-label">High Risk</div>
+                                        <div class="bar-container">
+                                            <div class="bar-fill high" style="width: 7%"></div>
+                                        </div>
+                                        <div class="bar-value">7%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Recent Activity</h3>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon">📊</div>
+                                <div class="activity-content">
+                                    <p class="activity-text">New assessment completed</p>
+                                    <span class="activity-time">2 minutes ago</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon high-risk">⚠️</div>
+                                <div class="activity-content">
+                                    <p class="activity-text">High-risk patient detected</p>
+                                    <span class="activity-time">15 minutes ago</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">💓</div>
+                                <div class="activity-content">
+                                    <p class="activity-text">Vital signs threshold alert</p>
+                                    <span class="activity-time">1 hour ago</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">📈</div>
+                                <div class="activity-content">
+                                    <p class="activity-text">Model prediction accuracy: 92.3%</p>
+                                    <span class="activity-time">3 hours ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Patients Section -->
+            <section id="patients" class="content-section">
+                <div class="section-header-admin">
+                    <div>
+                        <h1>Patient Records</h1>
+                        <p class="subtitle">View and manage patient assessments</p>
+                    </div>
+                    <div class="header-actions">
+                        <input type="search" placeholder="Search patients..." class="search-input">
+                        <button class="btn-primary">+ Add Patient</button>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Patient ID</th>
+                                <th>Assessment Date</th>
+                                <th>Risk Score</th>
+                                <th>Status</th>
+                                <th>Heart Rate</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientsTableBody">
+                            <tr>
+                                <td>#P001247</td>
+                                <td>Feb 11, 2026 10:30 AM</td>
+                                <td><span class="risk-badge low">0.23</span></td>
+                                <td><span class="status-badge stable">Stable</span></td>
+                                <td>72 BPM</td>
+                                <td>
+                                    <button class="action-btn" title="View Details">👁️</button>
+                                    <button class="action-btn" title="Download Report">📄</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#P001246</td>
+                                <td>Feb 11, 2026 09:15 AM</td>
+                                <td><span class="risk-badge high">0.78</span></td>
+                                <td><span class="status-badge critical">High Risk</span></td>
+                                <td>95 BPM</td>
+                                <td>
+                                    <button class="action-btn" title="View Details">👁️</button>
+                                    <button class="action-btn" title="Download Report">📄</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#P001245</td>
+                                <td>Feb 11, 2026 08:45 AM</td>
+                                <td><span class="risk-badge moderate">0.52</span></td>
+                                <td><span class="status-badge warning">Monitor</span></td>
+                                <td>68 BPM</td>
+                                <td>
+                                    <button class="action-btn" title="View Details">👁️</button>
+                                    <button class="action-btn" title="Download Report">📄</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#P001244</td>
+                                <td>Feb 10, 2026 04:20 PM</td>
+                                <td><span class="risk-badge low">0.19</span></td>
+                                <td><span class="status-badge stable">Stable</span></td>
+                                <td>74 BPM</td>
+                                <td>
+                                    <button class="action-btn" title="View Details">👁️</button>
+                                    <button class="action-btn" title="Download Report">📄</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#P001243</td>
+                                <td>Feb 10, 2026 02:10 PM</td>
+                                <td><span class="risk-badge moderate">0.45</span></td>
+                                <td><span class="status-badge warning">Monitor</span></td>
+                                <td>81 BPM</td>
+                                <td>
+                                    <button class="action-btn" title="View Details">👁️</button>
+                                    <button class="action-btn" title="Download Report">📄</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics" class="content-section">
+                <div class="section-header-admin">
+                    <div>
+                        <h1>Analytics & Insights</h1>
+                        <p class="subtitle">Deep dive into health trends and patterns</p>
+                    </div>
+                </div>
+
+                <div class="analytics-grid">
+                    <div class="analytics-card full-width">
+                        <h3>Key Health Indicators Correlation</h3>
+                        <div class="correlation-matrix">
+                            <div class="matrix-item">
+                                <span class="matrix-label">High BP ↔ Heart Disease</span>
+                                <div class="correlation-bar">
+                                    <div class="correlation-fill" style="width: 78%"></div>
+                                </div>
+                                <span class="correlation-value">0.78</span>
+                            </div>
+                            <div class="matrix-item">
+                                <span class="matrix-label">BMI ↔ Diabetes Risk</span>
+                                <div class="correlation-bar">
+                                    <div class="correlation-fill" style="width: 72%"></div>
+                                </div>
+                                <span class="correlation-value">0.72</span>
+                            </div>
+                            <div class="matrix-item">
+                                <span class="matrix-label">Smoking ↔ Overall Risk</span>
+                                <div class="correlation-bar">
+                                    <div class="correlation-fill" style="width: 65%"></div>
+                                </div>
+                                <span class="correlation-value">0.65</span>
+                            </div>
+                            <div class="matrix-item">
+                                <span class="matrix-label">Physical Activity ↔ Risk</span>
+                                <div class="correlation-bar negative">
+                                    <div class="correlation-fill" style="width: 58%"></div>
+                                </div>
+                                <span class="correlation-value">-0.58</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3>Age Group Distribution</h3>
+                        <div class="age-distribution">
+                            <div class="age-item">
+                                <span>18-34</span>
+                                <div class="age-bar">
+                                    <div class="age-fill" style="width: 25%"></div>
+                                </div>
+                                <span>25%</span>
+                            </div>
+                            <div class="age-item">
+                                <span>35-54</span>
+                                <div class="age-bar">
+                                    <div class="age-fill" style="width: 42%"></div>
+                                </div>
+                                <span>42%</span>
+                            </div>
+                            <div class="age-item">
+                                <span>55-74</span>
+                                <div class="age-bar">
+                                    <div class="age-fill" style="width: 28%"></div>
+                                </div>
+                                <span>28%</span>
+                            </div>
+                            <div class="age-item">
+                                <span>75+</span>
+                                <div class="age-bar">
+                                    <div class="age-fill" style="width: 5%"></div>
+                                </div>
+                                <span>5%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3>Top Risk Factors</h3>
+                        <div class="risk-factors-list">
+                            <div class="risk-factor-item">
+                                <span class="rank">1</span>
+                                <span class="factor-name">High Blood Pressure</span>
+                                <span class="factor-percentage">34%</span>
+                            </div>
+                            <div class="risk-factor-item">
+                                <span class="rank">2</span>
+                                <span class="factor-name">High Cholesterol</span>
+                                <span class="factor-percentage">28%</span>
+                            </div>
+                            <div class="risk-factor-item">
+                                <span class="rank">3</span>
+                                <span class="factor-name">Obesity (BMI &gt; 30)</span>
+                                <span class="factor-percentage">22%</span>
+                            </div>
+                            <div class="risk-factor-item">
+                                <span class="rank">4</span>
+                                <span class="factor-name">Smoking</span>
+                                <span class="factor-percentage">18%</span>
+                            </div>
+                            <div class="risk-factor-item">
+                                <span class="rank">5</span>
+                                <span class="factor-name">Lack of Exercise</span>
+                                <span class="factor-percentage">15%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ML Model Section -->
+            <section id="model" class="content-section">
+                <div class="section-header-admin">
+                    <div>
+                        <h1>ML Model Management</h1>
+                        <p class="subtitle">Monitor and manage the Random Forest prediction model</p>
+                    </div>
+                </div>
+
+                <div class="model-grid">
+                    <div class="model-card">
+                        <h3>Model Performance</h3>
+                        <div class="performance-metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">Accuracy</span>
+                                <div class="metric-bar">
+                                    <div class="metric-fill" style="width: 92%"></div>
+                                </div>
+                                <span class="metric-value">92.0%</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Precision</span>
+                                <div class="metric-bar">
+                                    <div class="metric-fill" style="width: 89%"></div>
+                                </div>
+                                <span class="metric-value">89.0%</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Recall</span>
+                                <div class="metric-bar">
+                                    <div class="metric-fill" style="width: 91%"></div>
+                                </div>
+                                <span class="metric-value">91.0%</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">F1 Score</span>
+                                <div class="metric-bar">
+                                    <div class="metric-fill" style="width: 90%"></div>
+                                </div>
+                                <span class="metric-value">90.0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="model-card">
+                        <h3>Model Information</h3>
+                        <div class="model-info">
+                            <div class="info-row">
+                                <span class="info-label">Model Type:</span>
+                                <span class="info-value">Random Forest Classifier</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Version:</span>
+                                <span class="info-value">1.0.0</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Last Trained:</span>
+                                <span class="info-value">Feb 10, 2026</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Training Samples:</span>
+                                <span class="info-value">253,680</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Features:</span>
+                                <span class="info-value">19 parameters</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Model Size:</span>
+                                <span class="info-value">10.7 MB</span>
+                            </div>
+                        </div>
+                        <button class="btn-primary" style="margin-top: 1rem; width: 100%;">Retrain Model</button>
+                    </div>
+
+                    <div class="model-card full-width-model">
+                        <h3>Feature Importance</h3>
+                        <div class="feature-importance">
+                            <div class="feature-item">
+                                <span class="feature-name">High Blood Pressure</span>
+                                <div class="feature-bar">
+                                    <div class="feature-fill" style="width: 18%"></div>
+                                </div>
+                                <span class="feature-value">0.18</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-name">Age</span>
+                                <div class="feature-bar">
+                                    <div class="feature-fill" style="width: 15%"></div>
+                                </div>
+                                <span class="feature-value">0.15</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-name">BMI</span>
+                                <div class="feature-bar">
+                                    <div class="feature-fill" style="width: 13%"></div>
+                                </div>
+                                <span class="feature-value">0.13</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-name">General Health</span>
+                                <div class="feature-bar">
+                                    <div class="feature-fill" style="width: 12%"></div>
+                                </div>
+                                <span class="feature-value">0.12</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-name">High Cholesterol</span>
+                                <div class="feature-bar">
+                                    <div class="feature-fill" style="width: 11%"></div>
+                                </div>
+                                <span class="feature-value">0.11</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="content-section">
+                <div class="section-header-admin">
+                    <div>
+                        <h1>System Settings</h1>
+                        <p class="subtitle">Configure platform parameters and preferences</p>
+                    </div>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <h3>API Configuration</h3>
+                        <div class="setting-item">
+                            <label>API Base URL</label>
+                            <input type="text" value="http://localhost:8000" class="setting-input">
+                        </div>
+                        <div class="setting-item">
+                            <label>Prediction Endpoint</label>
+                            <input type="text" value="/predict" class="setting-input">
+                        </div>
+                        <div class="setting-item">
+                            <label>Analytics Endpoint</label>
+                            <input type="text" value="/aura/analyze" class="setting-input">
+                        </div>
+                        <button class="btn-primary">Save Changes</button>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>Alert Thresholds</h3>
+                        <div class="setting-item">
+                            <label>High Risk Threshold</label>
+                            <input type="number" value="0.6" step="0.01" min="0" max="1" class="setting-input">
+                            <span class="setting-help">Risk score above this triggers high-risk alert</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>Heart Rate Alert (BPM)</label>
+                            <input type="number" value="120" class="setting-input">
+                            <span class="setting-help">Heart rate above this triggers tachycardia alert</span>
+                        </div>
+                        <button class="btn-primary">Save Changes</button>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>Data Management</h3>
+                        <div class="setting-actions">
+                            <button class="btn-secondary full-width">📥 Export All Data</button>
+                            <button class="btn-secondary full-width">🔄 Sync Database</button>
+                            <button class="btn-secondary full-width">🗑️ Clear Cache</button>
+                            <button class="btn-secondary full-width danger">⚠️ Reset System</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="admin.js"></script>
+</body>
+
+</html>

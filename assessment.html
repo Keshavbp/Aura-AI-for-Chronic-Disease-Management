@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Assessment - Care Beyond Clinic</title>
+    <meta name="description"
+        content="Complete your comprehensive health assessment powered by AI. Get instant chronic disease risk predictions.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="assessment.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 5L25 15L35 17L27.5 24.5L29.5 35L20 29.5L10.5 35L12.5 24.5L5 17L15 15L20 5Z"
+                            fill="url(#gradient1)" />
+                        <defs>
+                            <linearGradient id="gradient1" x1="5" y1="5" x2="35" y2="35">
+                                <stop offset="0%" stop-color="#667eea" />
+                                <stop offset="100%" stop-color="#764ba2" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <span class="logo-text">Care Beyond Clinic</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="assessment.html" class="active">Health Assessment</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#features">Features</a></li>
+                <li><a href="admin.html" class="nav-admin">Admin</a></li>
+            </ul>
+            <button class="nav-cta" onclick="window.location.href='index.html'">Back to Home</button>
+        </div>
+    </nav>
+
+    <!-- Assessment Page -->
+    <main class="assessment-page">
+        <div class="assessment-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <span class="section-badge">AI-Powered Analysis</span>
+                <h1 class="page-title">Complete Health Assessment</h1>
+                <p class="page-description">Fill in your health information to receive personalized chronic disease risk
+                    predictions</p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+                <div class="progress-text" id="progressText">0% Complete</div>
+            </div>
+
+            <!-- Assessment Form -->
+            <div class="form-layout">
+                <form id="assessmentForm" class="assessment-form">
+                    <!-- Section 1: Basic Health Indicators -->
+                    <div class="form-section">
+                        <h2 class="section-heading">
+                            <span class="section-icon">🩺</span>
+                            Basic Health Indicators
+                        </h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="HighBP">High Blood Pressure</label>
+                                <select id="HighBP" name="HighBP" required>
+                                    <option value="">Select...</option>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <span class="field-help">Have you been diagnosed with hypertension?</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="HighChol">High Cholesterol</label>
+                                <select id="HighChol" name="HighChol" required>
+                                    <option value="">Select...</option>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <span class="field-help">Have you been diagnosed with high cholesterol?</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="BMI">Body Mass Index (BMI)</label>
+                                <input type="number" id="BMI" name="BMI" min="10" max="60" step="0.1"
+                                    placeholder="e.g., 24.5" required>
+                                <span class="field-help">Your BMI (weight in kg / height in m²)</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="GenHlth">General Health</label>
+                                <select id="GenHlth" name="GenHlth" required>
+                                    <option value="">Select...</option>
+                                    <option value="1">Excellent</option>
+                                    <option value="2">Very Good</option>
+                                    <option value="3">Good</option>
+                                    <option value="4">Fair</option>
+                                    <option value="5">Poor</option>
+                                </select>
+                                <span class="field-help">Rate your general health</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Medical History -->
+                    <div class="form-section">
+                        <h2 class="section-heading">
+                            <span class="section-icon">📋</span>
+                            Medical History
+                        </h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="Stroke">Previous Stroke</label>
+                                <select id="Stroke" name="Stroke" required>
+                                    <option value="">Select...</option>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <span class="field-help">Have you ever had a stroke?</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="HeartDiseaseorAttack">Heart Disease or Attack</label>
+                                <select id="HeartDiseaseorAttack" name="HeartDiseaseorAttack" required>
+                                    <option value="">Select...</option>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <span class="field-help">Coronary heart disease or heart attack history?</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="MentHlth">Mental Health Days</label>
+                                <input type="number" id="MentHlth" name="MentHlth" min="0" max="30" placeholder="0-30"
+                                    required>
+                                <span class="field-help">Days of poor mental health in past 30 days</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="PhysHlth">Physical Health Days</label>
+                                <input type="number" id="PhysHlth" name="PhysHlth" min="0" max="30" placeholder="0-30"
+                                    required>
+                                <span class="field-help">Days of poor physical health in past 30 days</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="DiffWalk">Difficulty Walking</label>
+                                <select id="DiffWalk" name="DiffWalk" required>
+                                    <option value="">Select...</option>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <span class="field-help">Do you have difficulty walking or climbing stairs?</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Lifestyle Factors -->
+                    <div class="form-section">
+                        <h2 class="section-heading">
+                            <span class="section-icon">🏃</span>
+                            Lifestyle Factors
+                        </h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="Smoker">Smoker</label>
+                                <select id="Smoker" name="Smoker" required>
+                                    <option value="">Select...</option>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <span class="field-help">Have you smoked at least 100 cigarettes in your
+                                    lifetime?</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="PhysActivity">Physical Activity</label>
+                                <select id="PhysActivity" name="PhysActivity" required>
+                                    <option value="">Select...</option>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <span class="field-help">Physical activity in past 30 days (not job-related)?</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Fruits">Fruit Consumption</label>
+                                <select id="Fruits" name="Fruits" required>
+                                    <option value="">Select...</option>
+                                    <option value="0">Less than 1 per day</option>
+                                    <option value="1">1 or more per day</option>
+                                </select>
+                                <span class="field-help">Do you consume fruit 1 or more times per day?</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Veggies">Vegetable Consumption</label>
+                                <select id="Veggies" name="Veggies" required>
+                                    <option value="">Select...</option>
+                                    <option value="0">Less than 1 per day</option>
+                                    <option value="1">1 or more per day</option>
+                                </select>
+                                <span class="field-help">Do you consume vegetables 1 or more times per day?</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="HvyAlcoholConsump">Heavy Alcohol Consumption</label>
+                                <select id="HvyAlcoholConsump" name="HvyAlcoholConsump" required>
+                                    <option value="">Select...</option>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <span class="field-help">Adult men: &gt;14 drinks/week, women: &gt;7 drinks/week</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Healthcare Access -->
+                    <div class="form-section">
+                        <h2 class="section-heading">
+                            <span class="section-icon">🏥</span>
+                            Healthcare Access
+                        </h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="AnyHealthcare">Healthcare Coverage</label>
+                                <select id="AnyHealthcare" name="AnyHealthcare" required>
+                                    <option value="">Select...</option>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <span class="field-help">Do you have any health insurance?</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="NoDocbcCost">Cost Barrier to Doctor</label>
+                                <select id="NoDocbcCost" name="NoDocbcCost" required>
+                                    <option value="">Select...</option>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <span class="field-help">Was there a time in the past 12 months when you needed to see a
+                                    doctor but could not because of cost?</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 5: Demographics -->
+                    <div class="form-section">
+                        <h2 class="section-heading">
+                            <span class="section-icon">👤</span>
+                            Demographics
+                        </h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="Sex">Sex</label>
+                                <select id="Sex" name="Sex" required>
+                                    <option value="">Select...</option>
+                                    <option value="0">Female</option>
+                                    <option value="1">Male</option>
+                                </select>
+                                <span class="field-help">Biological sex</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Age">Age Group</label>
+                                <select id="Age" name="Age" required>
+                                    <option value="">Select...</option>
+                                    <option value="1">18-24</option>
+                                    <option value="2">25-29</option>
+                                    <option value="3">30-34</option>
+                                    <option value="4">35-39</option>
+                                    <option value="5">40-44</option>
+                                    <option value="6">45-49</option>
+                                    <option value="7">50-54</option>
+                                    <option value="8">55-59</option>
+                                    <option value="9">60-64</option>
+                                    <option value="10">65-69</option>
+                                    <option value="11">70-74</option>
+                                    <option value="12">75-79</option>
+                                    <option value="13">80+</option>
+                                </select>
+                                <span class="field-help">Your age group</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Education">Education Level</label>
+                                <select id="Education" name="Education" required>
+                                    <option value="">Select...</option>
+                                    <option value="1">Never attended school or only kindergarten</option>
+                                    <option value="2">Grades 1 through 8</option>
+                                    <option value="3">Grades 9 through 11</option>
+                                    <option value="4">Grade 12 or GED</option>
+                                    <option value="5">College 1 to 3 years</option>
+                                    <option value="6">College 4 years or more</option>
+                                </select>
+                                <span class="field-help">Highest level of education completed</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Income">Income Level</label>
+                                <select id="Income" name="Income" required>
+                                    <option value="">Select...</option>
+                                    <option value="1">Less than $10,000</option>
+                                    <option value="2">$10,000 to $15,000</option>
+                                    <option value="3">$15,000 to $20,000</option>
+                                    <option value="4">$20,000 to $25,000</option>
+                                    <option value="5">$25,000 to $35,000</option>
+                                    <option value="6">$35,000 to $50,000</option>
+                                    <option value="7">$50,000 to $75,000</option>
+                                    <option value="8">$75,000 or more</option>
+                                </select>
+                                <span class="field-help">Annual household income</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary large" id="submitBtn">
+                            <span>Analyze My Health</span>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Results Panel -->
+                <div id="resultsPanel" class="results-panel hidden">
+                    <div class="results-header">
+                        <h2>Your Health Analysis</h2>
+                        <button class="close-btn" onclick="closeResults()">✕</button>
+                    </div>
+
+                    <div class="results-content">
+                        <!-- Risk Score -->
+                        <div class="result-card primary-result">
+                            <div class="result-icon">🎯</div>
+                            <div class="result-info">
+                                <h3>Chronic Disease Risk Score</h3>
+                                <div class="risk-score-display">
+                                    <span class="risk-percentage" id="riskScore">--</span>
+                                    <span class="risk-label" id="riskLabel">Calculating...</span>
+                                </div>
+                                <div class="risk-bar">
+                                    <div class="risk-fill" id="riskFill"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="result-card">
+                            <div class="result-icon">📊</div>
+                            <div class="result-info">
+                                <h3>Health Status</h3>
+                                <p class="status-text" id="statusText">--</p>
+                            </div>
+                        </div>
+
+                        <!-- Live Vitals -->
+                        <div class="result-card">
+                            <div class="result-icon">💓</div>
+                            <div class="result-info">
+                                <h3>Live Heart Rate</h3>
+                                <p class="vitals-text" id="vitalsText">-- BPM</p>
+                                <button class="btn-secondary" onclick="refreshVitals()">Refresh Vitals</button>
+                            </div>
+                        </div>
+
+                        <!-- Fusion Analysis -->
+                        <div class="result-card fusion-result">
+                            <div class="result-icon">⚡</div>
+                            <div class="result-info">
+                                <h3>Fusion Analysis</h3>
+                                <p class="fusion-text" id="fusionText">--</p>
+                            </div>
+                        </div>
+
+                        <!-- Recommendations -->
+                        <div class="recommendations">
+                            <h3>Personalized Recommendations</h3>
+                            <ul id="recommendationsList">
+                                <li>Complete the assessment to receive personalized recommendations</li>
+                            </ul>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="results-actions">
+                            <button class="btn-primary" onclick="window.print()">
+                                <span>Download Report</span>
+                            </button>
+                            <button class="btn-secondary" onclick="resetForm()">
+                                <span>New Assessment</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="assessment.js"></script>
+</body>
+
+</html>
