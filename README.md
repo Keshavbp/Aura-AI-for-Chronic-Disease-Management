@@ -1,6 +1,8 @@
-# Care Beyond Clinic - AI-Powered Chronic Disease Prevention Platform
+# Aura-AI-for-Chronic-Disease-Management - Care Beyond Clinic
 
-A stunning, modern web application for chronic disease risk assessment using machine learning. This platform features a beautiful dark-themed UI with gradient aesthetics, real-time health monitoring, and comprehensive admin dashboard.
+Aura is an AI-powered health-tech solution designed to solve the "Reactive Care" problem. While traditional medicine relies on periodic clinic visits, Aura provides a 24/7 digital safety net by fusing static Electronic Health Records (EHR) with high-velocity wearable data.
+
+This platform features a beautiful, stunning, modern dark-themed UI with gradient aesthetics, real-time health monitoring simulations, and a comprehensive admin dashboard.
 
 ## 🌟 Features
 
@@ -102,7 +104,7 @@ Response:
 ### Live Vitals
 ```javascript
 GET /wearable/stream?patient_id=patient_123
-
+ 
 Response:
 {
   "bpm": 72,
@@ -249,3 +251,4 @@ For issues or questions, please create an issue in the repository.
 **Built with ❤️ for better health outcomes**
 
 *Powered by Random Forest ML, FastAPI, and Modern Web Technologies*
+
