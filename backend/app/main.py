@@ -1,10 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import joblib
 import pandas as pd
 import random
 import time
+import os
 
 app = FastAPI(title="Aura Health-Tech API")
 
@@ -17,9 +20,16 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-# Load the artifacts we made in Colab
-model = joblib.load("aura_rf_model.pkl")
-scaler = joblib.load("aura_scaler.pkl")
+# Resolve paths dynamically relative to this file
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(BASE_DIR))
+model_path = os.path.join(PROJECT_ROOT, "models", "aura_rf_model.pkl")
+scaler_path = os.path.join(PROJECT_ROOT, "models", "aura_scaler.pkl")
+frontend_dir = os.path.join(PROJECT_ROOT, "frontend")
+
+# Load the ML models
+model = joblib.load(model_path)
+scaler = joblib.load(scaler_path)
 
 # Define what a 'Patient' looks like based on the dataset features
 class PatientData(BaseModel):
@@ -44,8 +54,35 @@ class PatientData(BaseModel):
     Education: float
     Income: float
 
+# Mount static directories
+app.mount("/css", StaticFiles(directory=os.path.join(frontend_dir, "css")), name="css")
+app.mount("/js", StaticFiles(directory=os.path.join(frontend_dir, "js")), name="js")
+
 @app.get("/")
-def home():
+def read_root():
+    return FileResponse(os.path.join(frontend_dir, "index.html"))
+
+@app.get("/index.html")
+def read_index():
+    return FileResponse(os.path.join(frontend_dir, "index.html"))
+
+@app.get("/assessment.html")
+@app.get("/assessment")
+def read_assessment():
+    return FileResponse(os.path.join(frontend_dir, "assessment.html"))
+
+@app.get("/admin.html")
+@app.get("/admin")
+def read_admin():
+    return FileResponse(os.path.join(frontend_dir, "admin.html"))
+
+@app.get("/test_connection.html")
+@app.get("/test_connection")
+def read_test_connection():
+    return FileResponse(os.path.join(frontend_dir, "test_connection.html"))
+
+@app.get("/status")
+def status():
     return {"message": "Aura Backend is Online"}
 
 @app.post("/predict")

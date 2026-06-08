@@ -1,5 +1,7 @@
 // API Configuration
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = window.location.protocol.startsWith('http')
+    ? window.location.origin
+    : 'http://localhost:8000';
 
 // Navigation
 document.addEventListener('DOMContentLoaded', () => {
