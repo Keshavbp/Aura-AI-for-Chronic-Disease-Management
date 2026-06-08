@@ -1,66 +1,74 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
-import joblib
+import onnxruntime as ort
+import numpy as np
 import pandas as pd
 import random
 import time
 import os
+import contextlib
 
-app = FastAPI(title="Aura Health-Tech API")
+from sqlalchemy.ext.asyncio import AsyncSession
+from .schemas import PatientData, UserRead, UserCreate, UserUpdate
+from .models import User, PatientAssessment
+from .auth import auth_backend, fastapi_users, current_active_user
+from .database import engine, Base, get_async_session
 
-# Add CORS middleware to allow frontend-backend communication
+@contextlib.asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Automatically create database tables on startup
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+
+app = FastAPI(title="Aura Health-Tech API", lifespan=lifespan)
+
+# Restrict CORS middleware to local frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with specific frontend URL
+    allow_origins=["http://localhost:8080", "http://127.0.0.1:8080", "http://localhost:8000"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods (GET, POST, OPTIONS, etc.)
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],  
+    allow_headers=["*"],  
 )
 
 # Resolve paths dynamically relative to this file
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(os.path.dirname(BASE_DIR))
-model_path = os.path.join(PROJECT_ROOT, "models", "aura_rf_model.pkl")
-scaler_path = os.path.join(PROJECT_ROOT, "models", "aura_scaler.pkl")
+model_path = os.path.join(PROJECT_ROOT, "models", "aura_model.onnx")
+scaler_path = os.path.join(PROJECT_ROOT, "models", "aura_scaler.onnx")
 frontend_dir = os.path.join(PROJECT_ROOT, "frontend")
 
-# Load the ML models
-model = joblib.load(model_path)
-scaler = joblib.load(scaler_path)
-
-# Define what a 'Patient' looks like based on the dataset features
-class PatientData(BaseModel):
-    HighBP: float
-    HighChol: float
-    BMI: float
-    Smoker: float
-    Stroke: float
-    HeartDiseaseorAttack: float
-    PhysActivity: float
-    Fruits: float
-    Veggies: float
-    HvyAlcoholConsump: float
-    AnyHealthcare: float
-    NoDocbcCost: float
-    GenHlth: float
-    MentHlth: float
-    PhysHlth: float
-    DiffWalk: float
-    Sex: float
-    Age: float
-    Education: float
-    Income: float
+# Load the ML models securely via ONNX Runtime
+model_session = ort.InferenceSession(model_path)
+scaler_session = ort.InferenceSession(scaler_path)
 
 # Mount static directories
 app.mount("/css", StaticFiles(directory=os.path.join(frontend_dir, "css")), name="css")
 app.mount("/js", StaticFiles(directory=os.path.join(frontend_dir, "js")), name="js")
 
+# Auth Routers
+app.include_router(
+    fastapi_users.get_auth_router(auth_backend),
+    prefix="/auth/jwt",
+    tags=["auth"],
+)
+app.include_router(
+    fastapi_users.get_register_router(UserRead, UserCreate),
+    prefix="/auth",
+    tags=["auth"],
+)
+
 @app.get("/")
 def read_root():
     return FileResponse(os.path.join(frontend_dir, "index.html"))
+
+@app.get("/login.html")
+@app.get("/login")
+def read_login():
+    return FileResponse(os.path.join(frontend_dir, "login.html"))
 
 @app.get("/index.html")
 def read_index():
@@ -86,20 +94,42 @@ def status():
     return {"message": "Aura Backend is Online"}
 
 @app.post("/predict")
-def predict_risk(data: PatientData):
-    # Convert input to DataFrame for the scaler
-    input_df = pd.DataFrame([data.dict()])
+async def predict_risk(
+    data: PatientData, 
+    user: User = Depends(fastapi_users.current_user(active=True, optional=True)),
+    session: AsyncSession = Depends(get_async_session)
+):
+    # Convert input to float32 numpy array
+    input_data = pd.DataFrame([data.model_dump()]).astype(np.float32).values
     
-    # Scale and Predict
-    scaled_data = scaler.transform(input_df)
-    prediction = model.predict(scaled_data)
-    probability = model.predict_proba(scaled_data)[0][1]
+    # Scale and Predict using ONNX
+    scaler_inputs = {scaler_session.get_inputs()[0].name: input_data}
+    scaled_data = scaler_session.run(None, scaler_inputs)[0]
+    
+    model_inputs = {model_session.get_inputs()[0].name: scaled_data}
+    preds = model_session.run(None, model_inputs)
+    
+    prediction = preds[0][0]
+    probability = preds[1][0][1]
+    
+    status_label = "High Risk" if prediction[0] == 1 else "Stable"
+    risk_score = round(float(probability), 2)
+    
+    # Optionally save to DB if logged in
+    if user:
+        assessment = PatientAssessment(
+            user_id=user.id,
+            risk_score=risk_score,
+            status=status_label,
+            **data.model_dump()
+        )
+        session.add(assessment)
+        await session.commit()
     
     return {
-        "risk_score": round(float(probability), 2),
-        "status": "High Risk" if prediction[0] == 1 else "Stable"
+        "risk_score": risk_score,
+        "status": status_label
     }
-
 
 # Simulation: Latest heart rate memory
 current_heart_rate = {"bpm": 72, "timestamp": time.time()}
@@ -107,8 +137,6 @@ current_heart_rate = {"bpm": 72, "timestamp": time.time()}
 @app.get("/wearable/stream")
 def get_live_data(patient_id: str):
     """Simulates a live heart rate stream from a wearable."""
-    # Logic: Base HR (70) + random fluctuation. 
-    # If it's a 'high risk' ID, we can trigger a spike.
     if "risk" in patient_id.lower():
         new_bpm = random.randint(100, 140) # Simulate Tachycardia
     else:
@@ -118,18 +146,21 @@ def get_live_data(patient_id: str):
     current_heart_rate["timestamp"] = time.time()
     
     return current_heart_rate
+
 @app.post("/aura/analyze")
 def full_fusion_analysis(data: PatientData):
-    # 1. Get Static Risk (Random Forest)
-    input_df = pd.DataFrame([data.dict()])
-    scaled_data = scaler.transform(input_df)
-    static_prob = model.predict_proba(scaled_data)[0][1]
+    input_data = pd.DataFrame([data.model_dump()]).astype(np.float32).values
     
-    # 2. Check Live Vitals (Simulated)
-    # In a real app, this would query your InfluxDB/Kinesis stream
+    scaler_inputs = {scaler_session.get_inputs()[0].name: input_data}
+    scaled_data = scaler_session.run(None, scaler_inputs)[0]
+    
+    model_inputs = {model_session.get_inputs()[0].name: scaled_data}
+    preds = model_session.run(None, model_inputs)
+    
+    static_prob = preds[1][0][1]
+    
     live_bpm = current_heart_rate["bpm"]
     
-    # 3. Fusion Logic: Triage
     status = "Stable"
     if static_prob > 0.6 and live_bpm > 100:
         status = "CRITICAL: High Risk Patient + Elevated Heart Rate"
@@ -143,3 +174,16 @@ def full_fusion_analysis(data: PatientData):
         "clinical_risk": f"{round(static_prob * 100, 1)}%",
         "live_vitals": f"{live_bpm} BPM"
     }
+
+from sqlalchemy import select
+
+# Secure admin endpoint example
+@app.get("/admin/data")
+async def get_admin_data(user: User = Depends(current_active_user)):
+    return {"message": f"Hello {user.email}, you are authenticated to see admin data!"}
+
+@app.get("/admin/patients")
+async def get_admin_patients(user: User = Depends(current_active_user), session: AsyncSession = Depends(get_async_session)):
+    result = await session.execute(select(PatientAssessment).order_by(PatientAssessment.id.desc()).limit(50))
+    assessments = result.scalars().all()
+    return assessments

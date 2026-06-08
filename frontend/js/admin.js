@@ -5,6 +5,13 @@ const API_BASE_URL = window.location.protocol.startsWith('http')
 
 // Navigation
 document.addEventListener('DOMContentLoaded', () => {
+    // Auth Check
+    const token = localStorage.getItem('aura_token');
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
+
     // Section navigation
     const navItems = document.querySelectorAll('.nav-item');
     const sections = document.querySelectorAll('.content-section');
@@ -36,20 +43,61 @@ document.addEventListener('DOMContentLoaded', () => {
 // Load Dashboard Data
 async function loadDashboardData() {
     try {
-        // Check API status
-        const response = await fetch(`${API_BASE_URL}/`);
-        const data = await response.json();
-
-        console.log('API Status:', data);
-
-        // You can add more API calls here to fetch real data
-        // For now, we're using simulated data
+        // Fetch Real Patients from Database
+        const token = localStorage.getItem('aura_token');
+        const patientsRes = await fetch(`${API_BASE_URL}/admin/patients`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (patientsRes.ok) {
+            const patients = await patientsRes.json();
+            renderPatientsTable(patients);
+            showNotification('Live database connected successfully', 'success');
+        }
 
     } catch (error) {
         console.error('Error connecting to API:', error);
-        // Display a notification that API is offline
         showNotification('API server is offline. Using cached data.', 'warning');
     }
+}
+
+function renderPatientsTable(patients) {
+    const tableBody = document.getElementById('patientsTableBody');
+    if (!tableBody) return;
+    
+    tableBody.innerHTML = ''; // Clear hardcoded data
+    
+    if (patients.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center">No assessments found. Submit one via the Health Assessment page!</td></tr>';
+        return;
+    }
+    
+    patients.forEach(patient => {
+        const row = document.createElement('tr');
+        
+        let riskClass = 'low';
+        let statusClass = 'stable';
+        if (patient.risk_score > 0.6) {
+            riskClass = 'high';
+            statusClass = 'critical';
+        } else if (patient.risk_score > 0.3) {
+            riskClass = 'moderate';
+            statusClass = 'warning';
+        }
+        
+        row.innerHTML = `
+            <td>#P${patient.id.toString().padStart(5, '0')}</td>
+            <td>Just now</td>
+            <td><span class="risk-badge ${riskClass}">${patient.risk_score}</span></td>
+            <td><span class="status-badge ${statusClass}">${patient.status}</span></td>
+            <td>-- BPM</td>
+            <td>
+                <button class="action-btn" title="View Details">👁️</button>
+                <button class="action-btn" title="Download Report">📄</button>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
 }
 
 // Refresh Dashboard
@@ -127,8 +175,9 @@ function showNotification(message, type = 'info') {
 function logout() {
     if (confirm('Are you sure you want to logout?')) {
         showNotification('Logging out...', 'info');
+        localStorage.removeItem('aura_token');
         setTimeout(() => {
-            window.location.href = 'index.html';
+            window.location.href = 'login.html';
         }, 1000);
     }
 }
@@ -266,12 +315,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// API Status Check
+// API Status Check & Token Verification
 async function checkAPIStatus() {
     try {
-        const response = await fetch(`${API_BASE_URL}/`);
-        const data = await response.json();
-        return true;
+        const token = localStorage.getItem('aura_token');
+        const response = await fetch(`${API_BASE_URL}/admin/data`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.status === 401) {
+            // Token expired or invalid
+            localStorage.removeItem('aura_token');
+            window.location.href = 'login.html';
+            return false;
+        }
+        return response.ok;
     } catch (error) {
         return false;
     }
