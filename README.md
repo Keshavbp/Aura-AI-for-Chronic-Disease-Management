@@ -21,6 +21,12 @@ This platform features a beautiful, stunning, modern dark-themed UI with gradien
 - **ML Model Monitoring** - Track model performance and feature importance
 - **System Settings** - Configure platform parameters
 
+### Security & Architecture
+- **Cloud Database** - Persistent patient records via Supabase PostgreSQL
+- **Secure Authentication** - FastAPI Users with JWT token-based login/registration
+- **ONNX ML Runtime** - Machine learning models running on secure ONNX runtime (zero serialization vulnerabilities)
+- **CORS Protection** - Strict Cross-Origin Resource Sharing policies
+
 ## 📁 Project Structure
 
 ```
@@ -34,9 +40,13 @@ healthhack/
 ├── admin.css               # Admin dashboard styles
 ├── admin.js                # Admin dashboard logic
 ├── main.py                 # FastAPI backend
-├── requirement.txt         # Python dependencies
-├── aura_rf_model.pkl      # Trained Random Forest model
-└── aura_scaler.pkl        # Feature scaler
+├── database.py             # Database connection & session management
+├── models.py               # SQLAlchemy ORM models
+├── schemas.py              # Pydantic validation schemas
+├── auth.py                 # JWT Authentication setup
+├── requirements.txt        # Python dependencies
+├── aura_model.onnx        # Secure ONNX Random Forest model
+└── aura_scaler.onnx       # Secure ONNX Feature scaler
 ```
 
 ## 🚀 Getting Started
@@ -49,7 +59,14 @@ healthhack/
 
 1. **Install Python Dependencies**
    ```bash
-   pip install -r requirement.txt
+   pip install -r requirements.txt
+   ```
+
+2. **Configure Environment Variables**
+   Create a `.env` file in the root directory and add your Supabase connection string:
+   ```env
+   DATABASE_URL=postgresql+asyncpg://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT].supabase.co:5432/postgres
+   SECRET_KEY=your-super-secret-key
    ```
 
 2. **Start the FastAPI Backend**
@@ -169,11 +186,12 @@ The ML model analyzes the following 19 parameters:
 
 ## 🛡️ Security & Privacy
 
-- Local data processing
-- No data stored without consent
+- Persistent, secure cloud storage via Supabase PostgreSQL
+- Robust JWT token-based authentication and restricted dashboard routes
+- Machine Learning models utilize the secure ONNX runtime (immune to Python pickle deserialization exploits)
+- Strict Pydantic input validation boundaries
+- Restricted CORS policies
 - HIPAA-compliant architecture ready
-- Secure API communication
-- Data encryption support
 
 ## 🎨 Customization
 
@@ -250,5 +268,5 @@ For issues or questions, please create an issue in the repository.
 
 **Built with ❤️ for better health outcomes**
 
-*Powered by Random Forest ML, FastAPI, and Modern Web Technologies*
+*Powered by ONNX Runtime, FastAPI, Supabase PostgreSQL, and Modern Web Technologies*
 
